@@ -13,4 +13,4 @@ TEST(TransactionTest, ConstructorAndGettersWithdraw) {
     ASSERT_EQ("54321", transaction.getAccountNumber());
     ASSERT_EQ(Transaction::Type::WITHDRAWAL, transaction.getType());
     ASSERT_EQ(50.0, transaction.getAmount());
-}~
+}
