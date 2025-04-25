@@ -10,18 +10,10 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Set Git Path (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Write-Host "Adding Git to PATH"
-          $env:PATH = "C:\Program Files\Git\bin;" + $env:PATH
-          Write-Host "PATH: $($env:PATH)"
-
       - uses: actions/checkout@v3
         with:
           submodules: recursive
@@ -35,39 +27,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake libgtest-dev lcov
 
-      - name: Install dependencies (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          # Install Chocolatey (Package Manager for Windows)
-          choco install -y cmake.install
-
-          # Download GTest
-          Invoke-WebRequest -Uri "https://github.com/google/googletest/archive/v1.14.0.zip" -OutFile "gtest.zip"
-
-          # Extract GTest
-          Expand-Archive -Path "gtest.zip" -DestinationPath "."
-
-          # Add CMake to PATH
-          $env:PATH = "C:\Program Files\CMake\bin;" + $env:PATH
-          [Environment]::SetEnvironmentVariable("PATH", $env:PATH, "User")
-          Write-Host "CMake added to PATH"
-
       - name: Remove build directory (Clean CMake Cache) - Linux
         if: runner.os == 'Linux'
         shell: bash
         run: rm -rf ${{ github.workspace }}/build && rm -f ${{ github.workspace }}/CMakeCache.txt
-
-      - name: Remove build directory (Clean CMake Cache) - Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $BUILD_DIR = "${{ github.workspace }}/build"
-          if (Test-Path -Path $BUILD_DIR) {
-            Remove-Item -Path $BUILD_DIR -Recurse -Force -ErrorAction SilentlyContinue
-          } else {
-            Write-Host "Build directory does not exist, skipping removal."
-          }
 
       - name: Clear Git Cache
         shell: bash
@@ -80,26 +43,12 @@ jobs:
           echo "Listing files in ${{ github.workspace }}"
           ls -lR ${{ github.workspace }}
 
-      - name: Debug - List Files - Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Write-Host "Listing files in ${{ github.workspace }}"
-          Get-ChildItem -Path ${{ github.workspace }} -Recurse | Format-List
-
       - name: Debug - Environment Variables - Linux
         if: runner.os == 'Linux'
         shell: bash
         run: |
           echo "Environment variables:"
           env
-
-      - name: Debug - Environment Variables - Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          echo "Environment variables:"
-          Get-ChildItem Env:
 
       - name: Configure CMake - Linux
         if: runner.os == 'Linux'
@@ -111,18 +60,7 @@ jobs:
           echo "Source directory: $SOURCE_DIR"
           echo "Build directory: $BUILD_DIR"
           cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Coverage
-
           set +x
-
-      - name: Configure CMake - Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $SOURCE_DIR = "${{ github.workspace }}"
-          $BUILD_DIR = "${{ github.workspace }}/build"
-          Write-Host "Source directory: $SOURCE_DIR"
-          Write-Host "Build directory: $BUILD_DIR"
-          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Coverage
 
       - name: Build - Linux
         if: runner.os == 'Linux'
@@ -133,13 +71,6 @@ jobs:
           cmake --build "$BUILD_DIR" --config Coverage
           set +x
 
-      - name: Build - Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $BUILD_DIR = "${{ github.workspace }}/build"
-          cmake --build "$BUILD_DIR" --config Coverage
-
       - name: Test - Linux
         if: runner.os == 'Linux'
         shell: bash
@@ -148,13 +79,6 @@ jobs:
           BUILD_DIR="${{ github.workspace }}/build"
           ctest --test-dir "$BUILD_DIR"
           set +x
-
-      - name: Test - Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $BUILD_DIR = "${{ github.workspace }}/build"
-          ctest --test-dir "$BUILD_DIR"
 
       - name: Generate Coverage Report - Linux
         if: runner.os == 'Linux'

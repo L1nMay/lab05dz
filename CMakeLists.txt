@@ -4,6 +4,9 @@ project(banking)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Find GTest
+find_package(GTest REQUIRED)
+
 # Source files
 set(SOURCE_FILES
     src/Account.cpp
@@ -32,7 +35,7 @@ target_include_directories(banking PUBLIC
 # Tests
 enable_testing()
 add_executable(banking_test ${TEST_FILES})
-target_link_libraries(banking_test banking) # removed GTest
+target_link_libraries(banking_test banking GTest::GTest GTest::Main)
 
 # Coverage
 if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
