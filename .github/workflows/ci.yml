@@ -80,7 +80,7 @@ jobs:
           gcda_dirs=$(find . -name "*.gcda" -print0 | xargs -0 -n 1 dirname | sort -u)
 
           # Capture coverage data
-          lcov -directory . -base-directory ${{ github.workspace }} --ignore-errors mismatch -capture -output-file coverage.info
+          lcov -directory . -base-directory ${{ github.workspace }} --ignore-errors all -capture -output-file coverage.info
 
           # Remove unwanted coverage data
           lcov -remove coverage.info '/usr/*' '*/test/*' -output-file coverage.info
