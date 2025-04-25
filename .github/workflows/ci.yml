@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]  # Re-enable Windows
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -21,6 +21,15 @@ jobs:
           Write-Host "Adding Git to PATH"
           $env:PATH = "C:\Program Files\Git\bin;" + $env:PATH
           Write-Host "PATH: $($env:PATH)"
+
+      - name: Reset network settings (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "Resetting network settings"
+          netsh winsock reset
+          netsh int ip reset
+          ipconfig /flushdns
 
       - uses: actions/checkout@v3
         with:
