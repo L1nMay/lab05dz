@@ -43,13 +43,13 @@ jobs:
           choco install -y cmake.install
 
           # Download GTest
-          Invoke-WebRequest -Uri "https://codeload.github.com/google/googletest/zip/release-1.14.0" -OutFile "gtest.zip"
+          Invoke-WebRequest -Uri "https://github.com/google/googletest/archive/v1.14.0.zip" -OutFile "gtest.zip"
 
           # Extract GTest
           Expand-Archive -Path "gtest.zip" -DestinationPath "."
 
           # Set environment variable for GTest (Adjust the path if necessary)
-          [Environment]::SetEnvironmentVariable("GTEST_ROOT", "${{ github.workspace }}\googletest-release-1.14.0", "User")
+          [Environment]::SetEnvironmentVariable("GTEST_ROOT", "${{ github.workspace }}\googletest-1.14.0", "User")
 
           # Add CMake to PATH
           $env:PATH = "C:\Program Files\CMake\bin;" + $env:PATH
