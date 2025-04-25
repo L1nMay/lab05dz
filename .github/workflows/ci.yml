@@ -8,35 +8,66 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v3
-      - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install lcov
-      - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Coverage
-      - name: Build
-        run: cmake --build ${{github.workspace}}/build
-      - name: Run Tests and Generate Coverage
+
+      - name: Remove build directory (Clean CMake Cache)
+        shell: bash
+        run: rm -rf ${{ github.workspace }}/build
+
+      - name: Debug - List Files
+        shell: bash
         run: |
-          cd ${{github.workspace}}/build
-          ./banking_test
-          lcov -capture . -output-file coverage.info
-          lcov -remove coverage.info '/usr/*' -output-file coverage.info
-          lcov -remove coverage.info '*test*' -output-file coverage.info
-          genhtml coverage.info -output-directory coverage
-      - name: Upload Coverage to Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ${{github.workspace}}/build/coverage.info
-          flag-name: run-${{ github.run_id }}
-          parallel: true
-  coveralls_finish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel-finished: true~
+          echo "Listing files in ${{ github.workspace }}"
+          ls -lR ${{ github.workspace }}
+
+      - name: Debug - Environment Variables
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          echo "Environment variables:"
+          env
+      - name: Debug - Environment Variables
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          echo "Environment variables:"
+          Get-ChildItem Env:
+
+      - name: Configure CMake (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -x
+          SOURCE_DIR="${{ github.workspace }}/lab05dz/lab05dz/banking" # Corrected path
+          BUILD_DIR="${{ github.workspace }}/build"
+          echo "Source directory: $SOURCE_DIR"
+          echo "Build directory: $BUILD_DIR"
+          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
+          set +x
+      - name: Configure CMake (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $SOURCE_DIR = "${{ github.workspace }}/lab05dz/lab05dz/banking" # Corrected path
+          $BUILD_DIR = "${{ github.workspace }}/build"
+          Write-Host "Source directory: $SOURCE_DIR"
+          Write-Host "Build directory: $BUILD_DIR"
+          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -x
+          BUILD_DIR="${{ github.workspace }}/build"
+          cmake --build "$BUILD_DIR" --config Release
+          set +x
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        shell: pw
