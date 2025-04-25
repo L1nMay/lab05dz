@@ -24,3 +24,15 @@ TEST(AccountTest, WithdrawMoreThanBalanceFails) {
     ASSERT_FALSE(account.withdraw(100));
     ASSERT_EQ(account.getBalance(), 0);
 }
+
+TEST(AccountTest, DepositNegativeAmountFails) {
+    Account account("testAccount", 0.0);
+    ASSERT_FALSE(account.deposit(-100));
+    ASSERT_EQ(account.getBalance(), 0.0);
+}
+
+TEST(AccountTest, WithdrawNegativeAmountFails) {
+    Account account("testAccount", 100.0);
+    ASSERT_FALSE(account.withdraw(-50));
+    ASSERT_EQ(account.getBalance(), 100.0);
+}
