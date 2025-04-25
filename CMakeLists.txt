@@ -4,7 +4,18 @@ project(banking)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(GTest REQUIRED)
+# Пути к GTest (для Windows)
+if(WIN32)
+    set(GTEST_INCLUDE_DIR $ENV{GTEST_ROOT})
+    set(GTEST_LIBRARY C:/ProgramData/chocolatey/lib/gtest/lib/gtest.lib) #путь до gtest.lib
+    set(GTEST_MAIN_LIBRARY C:/ProgramData/chocolatey/lib/gtest/lib/gtest_main.lib) #путь до gtest_main.lib
+endif()
+
+# Find GTest
+include(FindGTest)
+if (NOT GTest_FOUND)
+    message(FATAL_ERROR "GTest not found, please set GTEST_ROOT variable")
+endif()
 
 # Source files
 set(SOURCE_FILES
