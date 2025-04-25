@@ -4,24 +4,15 @@ project(banking)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find Google Test and Google Mock
+# Find Google Test
 include(FetchContent)
 FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG v1.13.0 # Changed tag
-    #GIT_SHALLOW 0  # Removed this line
-)
-
-FetchContent_Declare(
-    googlemock
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG v1.13.0 # Changed tag
-    #GIT_SHALLOW 0  # Removed this line
+    GIT_TAG v1.13.0
 )
 
 FetchContent_MakeAvailable(googletest)
-FetchContent_MakeAvailable(googlemock)
 
 # Source files
 set(SOURCE_FILES
@@ -51,7 +42,7 @@ target_include_directories(banking PUBLIC
 # Tests
 enable_testing()
 add_executable(banking_test ${TEST_FILES})
-target_link_libraries(banking_test banking gtest gmock)
+target_link_libraries(banking_test banking gtest_main)  # Link with gtest_main
 add_test(NAME banking_tests COMMAND banking_test)
 
 # Coverage
