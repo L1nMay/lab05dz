@@ -51,9 +51,9 @@ jobs:
           # Install Chocolatey (Package Manager for Windows)
           choco install -y cmake.install
           # Install GTest
-          choco install -y googletest.install
+          choco install -y gtest --version 1.14.0 --source chocolatey
           # Set environment variable for GTest
-          [Environment]::SetEnvironmentVariable("GTEST_ROOT", "C:\ProgramData\chocolatey\lib\googletest.install\tools\googletest", "User")
+          [Environment]::SetEnvironmentVariable("GTEST_ROOT", "C:\ProgramData\chocolatey\lib\gtest\tools\gtest", "User")
           # Add CMake to PATH
           $env:PATH = "C:\Program Files\CMake\bin;" + $env:PATH
           [Environment]::SetEnvironmentVariable("PATH", $env:PATH, "User")
