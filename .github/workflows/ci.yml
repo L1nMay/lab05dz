@@ -26,7 +26,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake libgtest-dev lcov
-
       - name: Remove build directory (Clean CMake Cache) - Linux
         if: runner.os == 'Linux'
         shell: bash
@@ -47,7 +46,6 @@ jobs:
           echo "Build directory: $BUILD_DIR"
           cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Coverage
           set +x
-
       - name: Build - Linux
         if: runner.os == 'Linux'
         shell: bash
@@ -56,7 +54,6 @@ jobs:
           BUILD_DIR="${{ github.workspace }}/build"
           cmake --build "$BUILD_DIR" --config Coverage
           set +x
-
       - name: Test - Linux
         if: runner.os == 'Linux'
         shell: bash
@@ -68,23 +65,18 @@ jobs:
           # Ensure tests are run and gcda files are generated:
           find ${{ github.workspace }}/build -name "*.gcda" -print
           ls -l ${{ github.workspace }}/build/*.gcda || true
-
       - name: Generate Coverage Report - Linux
         if: runner.os == 'Linux'
         shell: bash
         run: |
           set -x
           cd ${{ github.workspace }}/build
-
           # Find all .gcda files and get their directories
           gcda_dirs=$(find . -name "*.gcda" -print0 | xargs -0 -n 1 dirname | sort -u)
-
           # Capture coverage data
-          lcov -directory . -base-directory ${{ github.workspace }} --ignore-errors all -capture -output-file coverage.info
-
+          lcov -directory . -base-directory ${{ github.workspace }} --ignore-errors mismatch -capture -output-file coverage.info
           # Remove unwanted coverage data
           lcov -remove coverage.info '/usr/*' '*/test/*' -output-file coverage.info
-
           # Generate HTML report
           genhtml -output-directory coverage coverage.info
           set +x
