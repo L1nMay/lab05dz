@@ -38,11 +38,17 @@ jobs:
           lfs: false # or true, depending on your repo
           submodules: recursive # Add this line
 
+      - name: Install cmake (Ubuntu)
+        if: runner.os == 'Linux'
+        shell: bash
+        timeout-minutes: 5  # Increased timeout
+        run: sudo apt-get update && sudo apt-get install -y cmake
+
       - name: Install gtest (Ubuntu)
         if: runner.os == 'Linux'
         shell: bash
-        timeout-minutes: 10  # Increased timeout
-        run: sudo apt-get update && sudo apt-get install -y libgtest-dev cmake
+        timeout-minutes: 5  # Increased timeout
+        run: sudo apt-get install -y libgtest-dev
 
       - name: Remove build directory (Clean CMake Cache) - Linux
         if: runner.os == 'Linux'
