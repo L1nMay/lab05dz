@@ -49,11 +49,16 @@ jobs:
         shell: pwsh
         run: |
           # Install Chocolatey (Package Manager for Windows)
-          choco install -y cmake
-          choco install -y gtest
+          choco install -y cmake.install
+          # Install GTest
+          choco install -y googletest.install
           # Set environment variable for GTest
-          [Environment]::SetEnvironmentVariable("GTEST_ROOT", "C:\ProgramData\chocolatey\lib\gtest\tools\gtest", "User")
+          [Environment]::SetEnvironmentVariable("GTEST_ROOT", "C:\ProgramData\chocolatey\lib\googletest.install\tools\googletest", "User")
+          # Add CMake to PATH
+          $env:PATH = "C:\Program Files\CMake\bin;" + $env:PATH
+          [Environment]::SetEnvironmentVariable("PATH", $env:PATH, "User")
           Write-Host "GTEST_ROOT environment variable set"
+          Write-Host "CMake added to PATH"
 
       - name: Remove build directory (Clean CMake Cache) - Linux
         if: runner.os == 'Linux'
@@ -124,3 +129,35 @@ jobs:
           Write-Host "Source directory: $SOURCE_DIR"
           Write-Host "Build directory: $BUILD_DIR"
           cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build - Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -x
+          BUILD_DIR="${{ github.workspace }}/build"
+          cmake --build "$BUILD_DIR" --config Release
+          set +x
+
+      - name: Build - Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $BUILD_DIR = "${{ github.workspace }}/build"
+          cmake --build "$BUILD_DIR" --config Release
+
+      - name: Test - Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -x
+          BUILD_DIR="${{ github.workspace }}/build"
+          ctest --test-dir "$BUILD_DIR"
+          set +x
+
+      - name: Test - Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $BUILD_DIR = "${{ github.workspace }}/build"
+          ctest --test-dir "$BUILD_DIR"
