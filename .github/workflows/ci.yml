@@ -45,7 +45,7 @@ jobs:
           BUILD_DIR="${{ github.workspace }}/build"
           echo "Source directory: $SOURCE_DIR"
           echo "Build directory: $BUILD_DIR"
-          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR"
+          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Coverage
           set +x
 
       - name: Build - Linux
@@ -79,15 +79,8 @@ jobs:
           # Find all .gcda files and get their directories
           gcda_dirs=$(find . -name "*.gcda" -print0 | xargs -0 -n 1 dirname | sort -u)
 
-          # Create an empty coverage.info file
-          lcov -directory . -o coverage.info -z
-
-          # Capture coverage data for each directory and append to coverage.info
-          for dir in $gcda_dirs; do
-            lcov -directory "$dir" -capture -output-file tmp.info
-            lcov -a coverage.info -a tmp.info -o coverage.info
-            rm tmp.info
-          done
+          # Capture coverage data
+          lcov -directory . -base-directory ${{ github.workspace }} -capture -output-file coverage.info
 
           # Remove unwanted coverage data
           lcov -remove coverage.info '/usr/*' '*/test/*' -output-file coverage.info
