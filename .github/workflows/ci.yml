@@ -50,22 +50,14 @@ jobs:
         run: |
           # Install Chocolatey (Package Manager for Windows)
           choco install -y cmake.install
-          # Install NuGet CLI
-          choco install nuget.commandline -y
 
-          # Add NuGet to PATH
-          $env:PATH = "$($env:PATH);C:\ProgramData\chocolatey\lib\nuget.commandline\tools"
-          [Environment]::SetEnvironmentVariable("PATH", $env:PATH, "User")
+          # Set environment variable for CMake to find GTest
+          [Environment]::SetEnvironmentVariable("CMAKE_PREFIX_PATH", "C:\ProgramData\chocolatey\lib\gtest", "User")
 
-          # Install GTest using NuGet
-          nuget install googletest -Version 1.14.0 -OutputDirectory lib
-
-          # Set environment variable for GTest
-          [Environment]::SetEnvironmentVariable("GTEST_ROOT", "${{ github.workspace }}\lib\googletest.1.14.0\build\native\include", "User")
           # Add CMake to PATH
           $env:PATH = "C:\Program Files\CMake\bin;" + $env:PATH
           [Environment]::SetEnvironmentVariable("PATH", $env:PATH, "User")
-          Write-Host "GTEST_ROOT environment variable set"
+          Write-Host "CMAKE_PREFIX_PATH environment variable set"
           Write-Host "CMake added to PATH"
 
       - name: Remove build directory (Clean CMake Cache) - Linux
