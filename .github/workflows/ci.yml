@@ -50,9 +50,17 @@ jobs:
         run: |
           # Install Chocolatey (Package Manager for Windows)
           choco install -y cmake.install
+          # Install GTest
 
+      - name: Find GTest location (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # Find where gtest is installed
+          $gtestPath = Get-ChildItem "C:\ProgramData\chocolatey\lib\gtest*" | Select-Object -ExpandProperty FullName
+          Write-Host "GTest installed in: $gtestPath"
           # Set environment variable for CMake to find GTest
-          [Environment]::SetEnvironmentVariable("CMAKE_PREFIX_PATH", "C:\ProgramData\chocolatey\lib\gtest", "User")
+          [Environment]::SetEnvironmentVariable("CMAKE_PREFIX_PATH", $gtestPath, "User")
 
           # Add CMake to PATH
           $env:PATH = "C:\Program Files\CMake\bin;" + $env:PATH
