@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]  # Re-enable Windows
+        os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -33,22 +33,27 @@ jobs:
 
       - uses: actions/checkout@v3
         with:
-          #sparse-checkout-cone-mode: false # Removed
-          #fetch-depth: 1 # Removed
-          lfs: false # or true, depending on your repo
-          submodules: recursive # Add this line
+          submodules: recursive
+          lfs: false
 
-      - name: Install cmake (Ubuntu)
+      - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
         shell: bash
-        timeout-minutes: 5  # Increased timeout
-        run: sudo apt-get update && sudo apt-get install -y cmake
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake libgtest-dev
 
-      - name: Install gtest (Ubuntu)
-        if: runner.os == 'Linux'
-        shell: bash
-        timeout-minutes: 5  # Increased timeout
-        run: sudo apt-get install -y libgtest-dev
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # Install Chocolatey (Package Manager for Windows)
+          choco install -y cmake --install-location="C:\Program Files\CMake"
+          choco install -y googletest
+          # Set environment variable for GTest
+          [Environment]::SetEnvironmentVariable("GTEST_ROOT", "C:\ProgramData\chocolatey\lib\googletest\tools\googletest", "User")
+          Write-Host "GTEST_ROOT environment variable set"
 
       - name: Remove build directory (Clean CMake Cache) - Linux
         if: runner.os == 'Linux'
@@ -61,7 +66,7 @@ jobs:
         run: |
           $BUILD_DIR = "${{ github.workspace }}/build"
           if (Test-Path -Path $BUILD_DIR) {
-            Remove-Item -Path $BUILD_DIR -Recurse -Force
+            Remove-Item -Path $BUILD_DIR -Recurse -Force -ErrorAction SilentlyContinue
           } else {
             Write-Host "Build directory does not exist, skipping removal."
           }
@@ -103,7 +108,7 @@ jobs:
         shell: bash
         run: |
           set -x
-          SOURCE_DIR="${{ github.workspace }}"  # Corrected path! CMakeLists.txt in root
+          SOURCE_DIR="${{ github.workspace }}"
           BUILD_DIR="${{ github.workspace }}/build"
           echo "Source directory: $SOURCE_DIR"
           echo "Build directory: $BUILD_DIR"
@@ -114,7 +119,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $SOURCE_DIR = "${{ github.workspace }}"  # Corrected path! CMakeLists.txt in root
+          $SOURCE_DIR = "${{ github.workspace }}"
           $BUILD_DIR = "${{ github.workspace }}/build"
           Write-Host "Source directory: $SOURCE_DIR"
           Write-Host "Build directory: $BUILD_DIR"
@@ -135,3 +140,19 @@ jobs:
         run: |
           $BUILD_DIR = "${{ github.workspace }}/build"
           cmake --build "$BUILD_DIR" --config Release
+
+      - name: Test - Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -x
+          BUILD_DIR="${{ github.workspace }}/build"
+          ctest --test-dir "$BUILD_DIR"
+          set +x
+
+      - name: Test - Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $BUILD_DIR = "${{ github.workspace }}/build"
+          ctest --test-dir "$BUILD_DIR"
