@@ -75,7 +75,7 @@ jobs:
           set -x
           cd ${{ github.workspace }}/build
           # Find all .gcda files and get their directories
-          gcda_dirs=$(find . -name "*.gcda" -print | xargs dirname | sort -u)
+          gcda_dirs=$(find . -name "*.gcda" -print | xargs -r dirname | sort -u)
 
           # Debug: Print the value of gcda_dirs
           echo "gcda_dirs: $gcda_dirs"
