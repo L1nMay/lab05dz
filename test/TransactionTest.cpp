@@ -9,8 +9,8 @@ TEST(TransactionTest, ConstructorAndGetters) {
 }
 
 TEST(TransactionTest, ConstructorAndGettersWithdraw) {
-    Transaction transaction("54321", Transaction::Type::WITHDRAW, 50.0);
+    Transaction transaction("54321", Transaction::Type::WITHDRAWAL, 50.0);
     ASSERT_EQ("54321", transaction.getAccountNumber());
-    ASSERT_EQ(Transaction::Type::WITHDRAW, transaction.getType());
+    ASSERT_EQ(Transaction::Type::WITHDRAWAL, transaction.getType());
     ASSERT_EQ(50.0, transaction.getAmount());
 }~
