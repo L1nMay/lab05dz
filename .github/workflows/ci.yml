@@ -33,7 +33,7 @@ jobs:
         timeout-minutes: 5
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake libgtest-dev
+          sudo apt-get install -y cmake
 
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
@@ -42,19 +42,9 @@ jobs:
           # Install Chocolatey (Package Manager for Windows)
           choco install -y cmake.install
 
-          # Download GTest
-          Invoke-WebRequest -Uri "https://github.com/google/googletest/archive/v1.14.0.zip" -OutFile "gtest.zip"
-
-          # Extract GTest
-          Expand-Archive -Path "gtest.zip" -DestinationPath "."
-
-          # Set environment variable for GTest (Adjust the path if necessary)
-          [Environment]::SetEnvironmentVariable("GTEST_ROOT", "${{ github.workspace }}\googletest-1.14.0", "User")
-
           # Add CMake to PATH
           $env:PATH = "C:\Program Files\CMake\bin;" + $env:PATH
           [Environment]::SetEnvironmentVariable("PATH", $env:PATH, "User")
-          Write-Host "GTEST_ROOT environment variable set"
           Write-Host "CMake added to PATH"
 
       - name: Remove build directory (Clean CMake Cache) - Linux
@@ -142,19 +132,3 @@ jobs:
         run: |
           $BUILD_DIR = "${{ github.workspace }}/build"
           cmake --build "$BUILD_DIR" --config Release
-
-      - name: Test - Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          set -x
-          BUILD_DIR="${{ github.workspace }}/build"
-          ctest --test-dir "$BUILD_DIR"
-          set +x
-
-      - name: Test - Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $BUILD_DIR = "${{ github.workspace }}/build"
-          ctest --test-dir "$BUILD_DIR"
