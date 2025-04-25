@@ -50,16 +50,3 @@ if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
     set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -fprofile-arcs -ftest-coverage")
 endif()
-
-# Install rules (optional)
-install(TARGETS banking
-    EXPORT banking-exports
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
-install(DIRECTORY include/
-    DESTINATION include
-)
-install(EXPORT banking-exports
-    DESTINATION lib/cmake/banking
-)
