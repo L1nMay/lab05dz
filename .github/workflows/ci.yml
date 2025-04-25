@@ -80,7 +80,7 @@ jobs:
           BUILD_DIR="${{ github.workspace }}/build"
           echo "Source directory: $SOURCE_DIR"
           echo "Build directory: $BUILD_DIR"
-          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_FIND_PACKAGE_GMOCK=TRUE
+          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release -Dgtest_disable_gmock=ON -DCMAKE_DISABLE_FIND_PACKAGE_GMOCK=TRUE
           set +x
 
       - name: Configure CMake - Windows
@@ -91,7 +91,7 @@ jobs:
           $BUILD_DIR = "${{ github.workspace }}/build"
           Write-Host "Source directory: $SOURCE_DIR"
           Write-Host "Build directory: $BUILD_DIR"
-          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_FIND_PACKAGE_GMOCK=TRUE
+          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release -Dgtest_disable_gmock=ON -DCMAKE_DISABLE_FIND_PACKAGE_GMOCK=TRUE
 
       - name: Remove gmock remnants (Linux)
         if: runner.os == 'Linux'
