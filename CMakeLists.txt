@@ -37,6 +37,7 @@ target_include_directories(banking PUBLIC
 enable_testing()
 add_executable(banking_test ${TEST_FILES})
 target_link_libraries(banking_test banking GTest::GTest GTest::Main)
+add_test(NAME banking_tests COMMAND banking_test)
 
 # Coverage
 if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
