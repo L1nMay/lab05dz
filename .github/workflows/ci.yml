@@ -50,7 +50,7 @@ jobs:
         run: |
           # Install Chocolatey (Package Manager for Windows)
           choco install -y cmake.install
-		  # Install NuGet CLI
+		      # Install NuGet CLI
           choco install nuget.commandline -y
 
           # Add NuGet to PATH
