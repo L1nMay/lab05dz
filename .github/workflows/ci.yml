@@ -90,10 +90,3 @@ jobs:
           lcov -remove coverage.info '/usr/*' '*/test/*' -output-file coverage.info
           genhtml -output-directory coverage coverage.info
           set +x
-
-      - name: Upload coverage to Coveralls
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          sudo apt-get install -y curl
-          curl -s https://codecov.io/bash | bash -s -- -Framework "github-actions"
