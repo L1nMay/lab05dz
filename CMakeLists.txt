@@ -12,6 +12,8 @@ FetchContent_Declare(
     GIT_TAG v1.13.0
 )
 
+set(gtest_disable_gmock ON CACHE BOOL "Disable gmock" FORCE) # Add this line
+
 FetchContent_MakeAvailable(googletest)
 
 # Source files
