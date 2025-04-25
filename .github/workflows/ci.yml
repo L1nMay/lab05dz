@@ -43,7 +43,7 @@ jobs:
           choco install -y cmake.install
 
           # Download GTest
-          Invoke-WebRequest -Uri "https://github.com/google/googletest/archive/release-1.14.0.zip" -OutFile "gtest.zip"
+          Invoke-WebRequest -Uri "https://codeload.github.com/google/googletest/zip/release-1.14.0" -OutFile "gtest.zip"
 
           # Extract GTest
           Expand-Archive -Path "gtest.zip" -DestinationPath "."
