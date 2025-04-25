@@ -22,15 +22,6 @@ jobs:
           $env:PATH = "C:\Program Files\Git\bin;" + $env:PATH
           Write-Host "PATH: $($env:PATH)"
 
-      - name: Reset network settings (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Write-Host "Resetting network settings"
-          netsh winsock reset
-          netsh int ip reset
-          ipconfig /flushdns
-
       - uses: actions/checkout@v3
         with:
           submodules: recursive
@@ -51,14 +42,9 @@ jobs:
           # Install Chocolatey (Package Manager for Windows)
           choco install -y cmake.install
           choco install -y gtest
-
-          # Set environment variable for GTest
-          [Environment]::SetEnvironmentVariable("GTEST_ROOT", "C:\ProgramData\chocolatey\lib\gtest\tools\gtest", "User")
-
           # Add CMake to PATH
           $env:PATH = "C:\Program Files\CMake\bin;" + $env:PATH
           [Environment]::SetEnvironmentVariable("PATH", $env:PATH, "User")
-          Write-Host "GTEST_ROOT environment variable set"
           Write-Host "CMake added to PATH"
 
       - name: Remove build directory (Clean CMake Cache) - Linux
