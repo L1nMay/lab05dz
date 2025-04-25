@@ -32,6 +32,10 @@ jobs:
         shell: bash
         run: rm -rf ${{ github.workspace }}/build && rm -f ${{ github.workspace }}/CMakeCache.txt
 
+      - name: Clear Git Cache
+        shell: bash
+        run: git fetch --all --prune
+
       - name: Configure CMake - Linux
         if: runner.os == 'Linux'
         shell: bash
@@ -72,6 +76,9 @@ jobs:
           cd ${{ github.workspace }}/build
           # Find all .gcda files and get their directories
           gcda_dirs=$(find . -name "*.gcda" -printf "%h\n" | sort -u)
+
+          # Debug: Print the value of gcda_dirs
+          echo "gcda_dirs: $gcda_dirs"
 
           # Run lcov for each directory
           lcov -capture -output-file coverage.info $gcda_dirs
