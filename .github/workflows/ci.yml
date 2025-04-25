@@ -40,12 +40,25 @@ jobs:
       - name: Remove build directory (Clean CMake Cache) - Linux
         if: runner.os == 'Linux'
         shell: bash
-        run: rm -rf ${{ github.workspace }}/build && rm -f ${{ github.workspace }}/CMakeCache.txt
+        run: |
+          rm -rf ${{ github.workspace }}/build && rm -f ${{ github.workspace }}/CMakeCache.txt
+
+      - name: Remove gmock remnants (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          find ${{ github.workspace }}/build -name "*gmock*" -print0 | xargs -0 rm -rf
 
       - name: Remove build directory (Clean CMake Cache) - Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: Remove-Item -Path ${{ github.workspace }}/build -Recurse -Force
+
+      - name: Remove gmock remnants (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path ${{ github.workspace }}/build -Recurse -Include "*gmock*" | Remove-Item -Recurse -Force
 
       - name: Clear Git Cache
         shell: bash
