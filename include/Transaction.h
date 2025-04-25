@@ -1,5 +1,5 @@
-#ifndef BANKING_TRANSACTION_H
-#define BANKING_TRANSACTION_H
+#ifndef TRANSACTION_H
+#define TRANSACTION_H
 
 #include <string>
 #include <chrono>
@@ -8,7 +8,8 @@ class Transaction {
 public:
     enum class Type {
         DEPOSIT,
-        WITHDRAWAL
+        WITHDRAWAL,
+        TRANSFER // Добавляем новый тип транзакции
     };
 
     Transaction(const std::string& accountNumber, Type type, double amount);
@@ -25,4 +26,4 @@ private:
     std::chrono::system_clock::time_point timestamp;
 };
 
-#endif // BANKING_TRANSACTION_H
+#endif

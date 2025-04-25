@@ -14,3 +14,10 @@ TEST(TransactionTest, ConstructorAndGettersWithdraw) {
     ASSERT_EQ(Transaction::Type::WITHDRAWAL, transaction.getType());
     ASSERT_EQ(50.0, transaction.getAmount());
 }
+
+TEST(TransactionTest, ConstructorAndGettersTransfer) {
+    Transaction transaction("67890", Transaction::Type::TRANSFER, 25.0);
+    ASSERT_EQ("67890", transaction.getAccountNumber());
+    ASSERT_EQ(Transaction::Type::TRANSFER, transaction.getType());
+    ASSERT_EQ(25.0, transaction.getAmount());
+}
