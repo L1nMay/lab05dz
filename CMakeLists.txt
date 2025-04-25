@@ -9,15 +9,15 @@ include(FetchContent)
 FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG v1.12.1
-    GIT_SHALLOW 0  # Add this line
+    GIT_TAG v1.13.0 # Changed tag
+    #GIT_SHALLOW 0  # Removed this line
 )
 
 FetchContent_Declare(
     googlemock
     GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG v1.12.1
-    GIT_SHALLOW 0  # Add this line
+    GIT_TAG v1.13.0 # Changed tag
+    #GIT_SHALLOW 0  # Removed this line
 )
 
 FetchContent_MakeAvailable(googletest)
