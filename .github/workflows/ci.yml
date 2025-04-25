@@ -51,7 +51,7 @@ jobs:
         shell: bash
         run: |
           set -x
-          SOURCE_DIR="${{ github.workspace }}/lab05dz/lab05dz/banking"
+          SOURCE_DIR="${{ github.workspace }}"  # Root of the repository
           BUILD_DIR="${{ github.workspace }}/build"
           echo "Source directory: $SOURCE_DIR"
           echo "Build directory: $BUILD_DIR"
@@ -62,7 +62,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $SOURCE_DIR = "${{ github.workspace }}/lab05dz/lab05dz/banking"
+          $SOURCE_DIR = "${{ github.workspace }}"  # Root of the repository
           $BUILD_DIR = "${{ github.workspace }}/build"
           Write-Host "Source directory: $SOURCE_DIR"
           Write-Host "Build directory: $BUILD_DIR"
