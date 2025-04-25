@@ -10,36 +10,37 @@ set(gtest_disable_gmock ON CACHE BOOL "Disable gmock" FORCE)
 # Find Google Test
 include(FetchContent)
 FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG v1.13.0
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.13.0
+        EXCLUDE_FROM_ALL TRUE # <-- Add this line
 )
 
 FetchContent_MakeAvailable(googletest)
 
 # Source files
 set(SOURCE_FILES
-    src/Account.cpp
-    src/Transaction.cpp
+        src/Account.cpp
+        src/Transaction.cpp
 )
 
 # Header files
 set(HEADER_FILES
-    include/Account.h
-    include/Transaction.h
+        include/Account.h
+        include/Transaction.h
 )
 
 # Test files
 set(TEST_FILES
-    test/AccountTest.cpp
-    test/TransactionTest.cpp
+        test/AccountTest.cpp
+        test/TransactionTest.cpp
 )
 
 # Library
 add_library(banking ${SOURCE_FILES} ${HEADER_FILES})
 target_include_directories(banking PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
 )
 
 # Tests
