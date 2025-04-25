@@ -58,7 +58,13 @@ jobs:
       - name: Remove build directory (Clean CMake Cache) - Windows
         if: runner.os == 'Windows'
         shell: pwsh
-        run: Remove-Item -Path ${{ github.workspace }}/build -Recurse -Force
+        run: |
+          $BUILD_DIR = "${{ github.workspace }}/build"
+          if (Test-Path -Path $BUILD_DIR) {
+            Remove-Item -Path $BUILD_DIR -Recurse -Force
+          } else {
+            Write-Host "Build directory does not exist, skipping removal."
+          }
 
       - name: Clear Git Cache
         shell: bash
