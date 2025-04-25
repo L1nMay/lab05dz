@@ -1,0 +1,10 @@
+/build
+*.cmake
+CMakeCache.txt
+CMakeFiles/
+Makefile
+*.gcda
+*.gcno
+*.gcov
+/coverage
+/test/banking_test

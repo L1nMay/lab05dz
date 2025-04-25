@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: sudo apt-get update && sudo apt-get install lcov
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Coverage
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build
+      - name: Run Tests and Generate Coverage
+        run: |
+          cd ${{github.workspace}}/build
+          ./banking_test
+          lcov -capture . -output-file coverage.info
+          lcov -remove coverage.info '/usr/*' -output-file coverage.info
+          lcov -remove coverage.info '*test*' -output-file coverage.info
+          genhtml coverage.info -output-directory coverage
+      - name: Upload Coverage to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ${{github.workspace}}/build/coverage.info
+          flag-name: run-${{ github.run_id }}
+          parallel: true
+  coveralls_finish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true~
