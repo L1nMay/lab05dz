@@ -36,9 +36,3 @@ target_include_directories(banking PUBLIC
 enable_testing()
 add_executable(banking_test ${TEST_FILES})
 target_link_libraries(banking_test banking GTest::GTest GTest::Main)
-
-# Coverage
-if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
-    set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -fprofile-arcs -ftest-coverage")
-endif()
