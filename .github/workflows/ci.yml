@@ -70,11 +70,19 @@ jobs:
         shell: bash
         run: git fetch --all --prune
 
-      - name: Debug - List Files
+      - name: Debug - List Files - Linux
+        if: runner.os == 'Linux'
         shell: bash
         run: |
           echo "Listing files in ${{ github.workspace }}"
           ls -lR ${{ github.workspace }}
+
+      - name: Debug - List Files - Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "Listing files in ${{ github.workspace }}"
+          Get-ChildItem -Path ${{ github.workspace }} -Recurse | Format-List
 
       - name: Debug - Environment Variables - Linux
         if: runner.os == 'Linux'
