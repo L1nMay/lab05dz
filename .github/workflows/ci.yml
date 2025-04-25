@@ -33,7 +33,7 @@ jobs:
         timeout-minutes: 5
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake
+          sudo apt-get install -y cmake libgtest-dev lcov
 
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
@@ -41,6 +41,12 @@ jobs:
         run: |
           # Install Chocolatey (Package Manager for Windows)
           choco install -y cmake.install
+
+          # Download GTest
+          Invoke-WebRequest -Uri "https://github.com/google/googletest/archive/v1.14.0.zip" -OutFile "gtest.zip"
+
+          # Extract GTest
+          Expand-Archive -Path "gtest.zip" -DestinationPath "."
 
           # Add CMake to PATH
           $env:PATH = "C:\Program Files\CMake\bin;" + $env:PATH
@@ -104,7 +110,8 @@ jobs:
           BUILD_DIR="${{ github.workspace }}/build"
           echo "Source directory: $SOURCE_DIR"
           echo "Build directory: $BUILD_DIR"
-          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
+          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Coverage
+
           set +x
 
       - name: Configure CMake - Windows
@@ -115,7 +122,7 @@ jobs:
           $BUILD_DIR = "${{ github.workspace }}/build"
           Write-Host "Source directory: $SOURCE_DIR"
           Write-Host "Build directory: $BUILD_DIR"
-          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
+          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Coverage
 
       - name: Build - Linux
         if: runner.os == 'Linux'
@@ -123,7 +130,7 @@ jobs:
         run: |
           set -x
           BUILD_DIR="${{ github.workspace }}/build"
-          cmake --build "$BUILD_DIR" --config Release
+          cmake --build "$BUILD_DIR" --config Coverage
           set +x
 
       - name: Build - Windows
@@ -131,4 +138,38 @@ jobs:
         shell: pwsh
         run: |
           $BUILD_DIR = "${{ github.workspace }}/build"
-          cmake --build "$BUILD_DIR" --config Release
+          cmake --build "$BUILD_DIR" --config Coverage
+
+      - name: Test - Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -x
+          BUILD_DIR="${{ github.workspace }}/build"
+          ctest --test-dir "$BUILD_DIR"
+          set +x
+
+      - name: Test - Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $BUILD_DIR = "${{ github.workspace }}/build"
+          ctest --test-dir "$BUILD_DIR"
+
+      - name: Generate Coverage Report - Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -x
+          cd ${{ github.workspace }}/build
+          lcov -capture . -output-file coverage.info
+          lcov -remove coverage.info '/usr/*' '*/test/*' -output-file coverage.info
+          genhtml -output-directory coverage coverage.info
+          set +x
+
+      - name: Upload coverage to Coveralls
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get install -y curl
+          curl -s https://codecov.io/bash | bash -s -- -Framework "github-actions"
