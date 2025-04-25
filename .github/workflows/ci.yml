@@ -36,6 +36,7 @@ jobs:
           #sparse-checkout-cone-mode: false # Removed
           #fetch-depth: 1 # Removed
           lfs: false # or true, depending on your repo
+          submodules: recursive # Add this line
 
       - name: Remove build directory (Clean CMake Cache) - Linux
         if: runner.os == 'Linux'
