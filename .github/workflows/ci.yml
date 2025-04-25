@@ -70,7 +70,7 @@ jobs:
         run: |
           set -x
           cd ${{ github.workspace }}/build
-          lcov -directory . -recursive -capture -output-file coverage.info
+          lcov -directory . -directory test -capture -output-file coverage.info
           lcov -remove coverage.info '/usr/*' '*/test/*' -output-file coverage.info
           genhtml -output-directory coverage coverage.info
           set +x
