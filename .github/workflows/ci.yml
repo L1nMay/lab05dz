@@ -47,18 +47,6 @@ jobs:
         shell: pwsh
         run: Remove-Item -Path ${{ github.workspace }}/build -Recurse -Force
 
-      - name: Remove gmock remnants (Linux)
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          find ${{ github.workspace }}/build -name "*gmock*" -print0 | xargs -0 rm -rf
-
-      - name: Remove gmock remnants (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path ${{ github.workspace }}/build -Recurse -Include "*gmock*" | Remove-Item -Recurse -Force
-
       - name: Clear Git Cache
         shell: bash
         run: git fetch --all --prune
@@ -104,6 +92,18 @@ jobs:
           Write-Host "Source directory: $SOURCE_DIR"
           Write-Host "Build directory: $BUILD_DIR"
           cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_FIND_PACKAGE_GMOCK=TRUE
+
+      - name: Remove gmock remnants (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          find ${{ github.workspace }}/build -name "*gmock*" -print0 | xargs -0 rm -rf
+
+      - name: Remove gmock remnants (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path ${{ github.workspace }}/build -Recurse -Include "*gmock*" | Remove-Item -Recurse -Force
 
       - name: Build - Linux
         if: runner.os == 'Linux'
