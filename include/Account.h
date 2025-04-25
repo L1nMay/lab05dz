@@ -5,7 +5,7 @@
 
 class Account {
 public:
-    Account() : accountNumber("default"), initialBalance(0.0) {} // Constructor by default
+    Account() : accountNumber("default"), initialBalance(0.0) {} // Constructor по умолчанию
     Account(const std::string& accountNumber, double initialBalance);
     bool deposit(double amount);
     bool withdraw(double amount);
