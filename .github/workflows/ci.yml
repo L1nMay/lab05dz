@@ -75,14 +75,14 @@ jobs:
         run: |
           set -x
           cd ${{ github.workspace }}/build
-          # Find all .gcda files and get their directories
-          gcda_dirs=$(find . -name "*.gcda" -print | xargs -r dirname | sort -u)
+          # Find all .gcda files
+          gcda_files=$(find . -name "*.gcda" -print | sort -u)
 
-          # Debug: Print the value of gcda_dirs
-          echo "gcda_dirs: $gcda_dirs"
+          # Debug: Print the value of gcda_files
+          echo "gcda_files: $gcda_files"
 
-          # Run lcov for each directory
-          lcov -capture -output-file coverage.info $gcda_dirs
+          # Run lcov for each file
+          lcov -capture -output-file coverage.info $gcda_files
 
           lcov -remove coverage.info '/usr/*' '*/test/*' -output-file coverage.info
           genhtml -output-directory coverage coverage.info
