@@ -22,9 +22,7 @@ jobs:
           $env:PATH = "C:\Program Files\Git\bin;" + $env:PATH
           Write-Host "PATH: $($env:PATH)"
 
-      - name: Checkout code
-        shell: pwsh # or bash, depending on what you want
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           #sparse-checkout-cone-mode: false # Removed
           #fetch-depth: 1 # Removed
