@@ -80,7 +80,7 @@ jobs:
           gcda_dirs=$(find . -name "*.gcda" -print0 | xargs -0 -n 1 dirname | sort -u)
 
           # Create an empty coverage.info file
-          lcov -o coverage.info -z
+          lcov -directory . -o coverage.info -z
 
           # Capture coverage data for each directory and append to coverage.info
           for dir in $gcda_dirs; do
