@@ -1,76 +1,18 @@
-name: CI
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          lfs: false
-
-      - name: Install dependencies (Ubuntu)
-        if: runner.os == 'Linux'
-        shell: bash
-        timeout-minutes: 5
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake libgtest-dev lcov
-
-      - name: Remove build directory (Clean CMake Cache) - Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: rm -rf ${{ github.workspace }}/build && rm -f ${{ github.workspace }}/CMakeCache.txt
-
-      - name: Configure CMake - Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          set -x
-          SOURCE_DIR="${{ github.workspace }}"
-          BUILD_DIR="${{ github.workspace }}/build"
-          echo "Source directory: $SOURCE_DIR"
-          echo "Build directory: $BUILD_DIR"
-          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Coverage
-          set +x
-
-      - name: Build - Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          set -x
-          BUILD_DIR="${{ github.workspace }}/build"
-          cmake --build "$BUILD_DIR" --config Coverage
-          set +x
-
-      - name: Test - Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          set -x
-          BUILD_DIR="${{ github.workspace }}/build"
-          ctest --test-dir "$BUILD_DIR"
-          set +x
-          # Ensure tests are run and gcda files are generated:
-          ls -l ${{ github.workspace }}/build/*.gcda || true # try to list the gcda files
-
-      - name: Generate Coverage Report - Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          set -x
-          cd ${{ github.workspace }}/build
-          lcov -directory . -directory test -capture -output-file coverage.info
-          lcov -remove coverage.info '/usr/*' '*/test/*' -output-file coverage.info
-          genhtml -output-directory coverage coverage.info
-          set +x
+1s
+Run set -x
+  set -x
+  cd /home/runner/work/lab05dz/lab05dz/build
+  lcov -directory . -directory test -capture -output-file coverage.info
+  lcov -remove coverage.info '/usr/*' '*/test/*' -output-file coverage.info
+  genhtml -output-directory coverage coverage.info
+  set +x
+  shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
++ cd /home/runner/work/lab05dz/lab05dz/build
++ lcov -directory . -directory test -capture -output-file coverage.info
+Capturing coverage data from . test
+geninfo cmd: '/usr/bin/geninfo . test --output-filename coverage.info --memory 0'
+Found gcov version: 13.3.0
+geninfo: ERROR: cannot read test!
+	(use "geninfo --ignore-errors gcov ..." to bypass this error)
+Using intermediate gcov format
+Error: Process completed with exit code 9.
