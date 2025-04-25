@@ -26,6 +26,10 @@ jobs:
         shell: pwsh
         run: Remove-Item -Path ${{ github.workspace }}/build -Recurse -Force
 
+      - name: Clear Git Cache
+        shell: bash
+        run: git fetch --all --prune
+
       - name: Debug - List Files
         shell: bash
         run: |
@@ -51,7 +55,7 @@ jobs:
         shell: bash
         run: |
           set -x
-          SOURCE_DIR="${{ github.workspace }}"  # Root of the repository
+          SOURCE_DIR="${{ github.workspace }}/lab05dz"  # CMakeLists.txt in lab05dz
           BUILD_DIR="${{ github.workspace }}/build"
           echo "Source directory: $SOURCE_DIR"
           echo "Build directory: $BUILD_DIR"
@@ -62,7 +66,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $SOURCE_DIR = "${{ github.workspace }}"  # Root of the repository
+          $SOURCE_DIR = "${{ github.workspace }}/lab05dz"  # CMakeLists.txt in lab05dz
           $BUILD_DIR = "${{ github.workspace }}/build"
           Write-Host "Source directory: $SOURCE_DIR"
           Write-Host "Build directory: $BUILD_DIR"
