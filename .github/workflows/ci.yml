@@ -32,10 +32,6 @@ jobs:
         shell: bash
         run: rm -rf ${{ github.workspace }}/build && rm -f ${{ github.workspace }}/CMakeCache.txt
 
-      - name: Clear Git Cache
-        shell: bash
-        run: git fetch --all --prune
-
       - name: Configure CMake - Linux
         if: runner.os == 'Linux'
         shell: bash
@@ -65,6 +61,8 @@ jobs:
           BUILD_DIR="${{ github.workspace }}/build"
           ctest --test-dir "$BUILD_DIR"
           set +x
+          # Ensure tests are run and gcda files are generated:
+          ls -l ${{ github.workspace }}/build/*.gcda || true # try to list the gcda files
 
       - name: Generate Coverage Report - Linux
         if: runner.os == 'Linux'
