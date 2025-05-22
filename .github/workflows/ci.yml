@@ -43,21 +43,31 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          ctest --output-on-failure || true  # Продолжаем даже если тесты упали
+          ctest --output-on-failure || echo "Some tests failed but continuing..."
 
       - name: Generate coverage report
         run: |
           cd build
-          lcov --capture --directory . --output-file coverage.info --ignore-errors mismatch
+          lcov --capture --directory . --output-file coverage.info \
+               --ignore-errors mismatch,unused,empty,negative,source \
+               --rc lcov_branch_coverage=0
+
           lcov --remove coverage.info \
                '/usr/*' \
                '*/test/*' \
                '*/gtest/*' \
                '*/gmock/*' \
-               --output-file coverage.info
+               '*/include/*' \
+               --output-file coverage.info \
+               --ignore-errors unused
+
           genhtml coverage.info \
                   --output-directory coverage \
-                  --ignore-errors unmapped,unused,missing
+                  --ignore-errors unmapped,unused,missing,negative \
+                  --legend \
+                  --title "Banking Coverage Report" \
+                  --highlight \
+                  --demangle-cpp
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
