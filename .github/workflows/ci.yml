@@ -6,28 +6,35 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  CC: gcc
+  CXX: g++
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake libgtest-dev libgmock-dev lcov
+          sudo apt-get install -y \
+            cmake \
+            g++ \
+            libgtest-dev \
+            libgmock-dev \
+            lcov \
+            git
 
-      - name: Configure and Build
+      - name: Build and test
         run: |
           mkdir -p build
           cd build
           cmake .. -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
           cmake --build . --config Debug
-
-      - name: Run tests
-        run: |
-          cd build
           ctest --output-on-failure
 
       - name: Generate coverage report
@@ -37,8 +44,9 @@ jobs:
           lcov --remove coverage.info '/usr/*' '*/test/*' --output-file coverage.info
           genhtml coverage.info --output-directory coverage
 
-      - name: Upload coverage
-        uses: actions/upload-artifact@v3
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: build/coverage
+          retention-days: 5
