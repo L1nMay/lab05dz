@@ -24,26 +24,10 @@ jobs:
           sudo apt-get install -y \
             cmake \
             g++ \
+            libgtest-dev \
+            libgmock-dev \
             lcov \
-            build-essential \
             git
-
-      - name: Build and install GTest/GMock
-        run: |
-          # Установка из системных пакетов (достаточно для Ubuntu 24.04)
-          sudo apt-get install -y libgtest-dev libgmock-dev
-
-          # Сборка и установка GTest
-          cd /usr/src/googletest
-          sudo cmake CMakeLists.txt
-          sudo make
-          sudo cp lib/libgtest.a lib/libgtest_main.a /usr/lib
-
-          # Сборка и установка GMock
-          cd /usr/src/googletest/googlemock
-          sudo cmake CMakeLists.txt
-          sudo make
-          sudo cp lib/libgmock.a lib/libgmock_main.a /usr/lib
 
       - name: Configure project
         run: |
@@ -54,7 +38,7 @@ jobs:
       - name: Build project
         run: |
           cd build
-          cmake --build . --config Debug
+          cmake --build . --config Debug --parallel $(nproc)
 
       - name: Run tests
         run: |

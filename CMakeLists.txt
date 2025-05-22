@@ -5,16 +5,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Enable coverage
+# Coverage flags
 option(ENABLE_COVERAGE "Enable coverage reporting" ON)
 if(ENABLE_COVERAGE)
     add_compile_options(--coverage -fprofile-arcs -ftest-coverage)
     add_link_options(--coverage -fprofile-arcs)
 endif()
 
-# Find GTest and GMock
+# Find GTest (which includes GMock in newer versions)
 find_package(GTest REQUIRED)
-find_package(GMock REQUIRED)
 include(GoogleTest)
 
 # Source files
@@ -34,6 +33,7 @@ set(TEST_FILES
     test/AccountTest.cpp
     test/TransactionTest.cpp
     test/main.cpp
+    test/MockAccount.h
 )
 
 # Library
@@ -53,20 +53,9 @@ target_link_libraries(banking_test PRIVATE
     gmock
 )
 
-# Automatically discover and add tests
-gtest_discover_tests(banking_test
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-    TEST_PREFIX "Tests: "
-)
+gtest_discover_tests(banking_test)
 
-# Set output directories
+# Output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
-# Install targets (optional)
-install(TARGETS banking
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-)
