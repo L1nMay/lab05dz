@@ -5,11 +5,13 @@
 
 class Account {
 public:
-    Account() : accountNumber("default"), initialBalance(0.0) {} // Constructor по умолчанию
+    Account() : accountNumber("default"), initialBalance(0.0) {}
     Account(const std::string& accountNumber, double initialBalance);
-    bool deposit(double amount);
-    bool withdraw(double amount);
-    double getBalance() const;
+
+    virtual bool deposit(double amount);
+    virtual bool withdraw(double amount);
+    virtual double getBalance() const;
+    virtual ~Account() = default;
 
 private:
     std::string accountNumber;

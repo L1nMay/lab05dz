@@ -14,6 +14,7 @@ endif()
 
 # Find GTest and GMock
 find_package(GTest REQUIRED)
+find_package(GMock REQUIRED)
 include(GoogleTest)
 
 # Source files

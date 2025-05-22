@@ -6,12 +6,12 @@
 
 class MockAccount : public Account {
 public:
-    MockAccount() : Account("mock", 0) {}
-    virtual ~MockAccount() = default;
+    MockAccount(const std::string& accountNumber = "mock", double initialBalance = 0)
+        : Account(accountNumber, initialBalance) {}
 
-    MOCK_METHOD(bool, deposit, (double amount), (override));
-    MOCK_METHOD(bool, withdraw, (double amount), (override));
-    MOCK_METHOD(double, getBalance, (), (const, override));
+    MOCK_METHOD(bool, deposit, (double amount));
+    MOCK_METHOD(bool, withdraw, (double amount));
+    MOCK_METHOD(double, getBalance, (), (const));
 };
 
 #endif // MOCKACCOUNT_H

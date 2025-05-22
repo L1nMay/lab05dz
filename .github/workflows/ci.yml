@@ -11,12 +11,14 @@ env:
   CXX: g++
 
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install dependencies
         run: |
@@ -27,15 +29,36 @@ jobs:
             libgtest-dev \
             libgmock-dev \
             lcov \
+            build-essential \
             git
 
-      - name: Build and test
+      - name: Build GTest and GMock
+        run: |
+          cd /usr/src/gtest
+          sudo cmake CMakeLists.txt
+          sudo make
+          sudo cp *.a /usr/lib
+          
+          cd /usr/src/gmock
+          sudo cmake CMakeLists.txt
+          sudo make
+          sudo cp *.a /usr/lib
+
+      - name: Configure project
         run: |
           mkdir -p build
           cd build
           cmake .. -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
-          cmake --build . --config Debug
-          ctest --output-on-failure
+
+      - name: Build project
+        run: |
+          cd build
+          cmake --build . --config Debug --verbose
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure --verbose
 
       - name: Generate coverage report
         run: |
@@ -49,4 +72,12 @@ jobs:
         with:
           name: coverage-report
           path: build/coverage
+          retention-days: 5
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: test-results
+          path: build/Testing/**/*.xml
           retention-days: 5
