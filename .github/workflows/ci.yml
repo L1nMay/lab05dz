@@ -8,75 +8,37 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          lfs: false
 
-      - name: Install dependencies (Ubuntu)
-        if: runner.os == 'Linux'
-        shell: bash
-        timeout-minutes: 5
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake libgtest-dev lcov
-      - name: Remove build directory (Clean CMake Cache) - Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: rm -rf ${{ github.workspace }}/build && rm -f ${{ github.workspace }}/CMakeCache.txt
+          sudo apt-get install -y cmake libgtest-dev libgmock-dev lcov
 
-      - name: Clear Git Cache
-        shell: bash
-        run: git fetch --all --prune
+      - name: Configure and Build
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DENABLE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
+          cmake --build . --config Debug
 
-      - name: Configure CMake - Linux
-        if: runner.os == 'Linux'
-        shell: bash
+      - name: Run tests
         run: |
-          set -x
-          SOURCE_DIR="${{ github.workspace }}"
-          BUILD_DIR="${{ github.workspace }}/build"
-          echo "Source directory: $SOURCE_DIR"
-          echo "Build directory: $BUILD_DIR"
-          cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Coverage
-          set +x
-      - name: Build - Linux
-        if: runner.os == 'Linux'
-        shell: bash
+          cd build
+          ctest --output-on-failure
+
+      - name: Generate coverage report
         run: |
-          set -x
-          BUILD_DIR="${{ github.workspace }}/build"
-          cmake --build "$BUILD_DIR" --config Coverage
-          set +x
-      - name: Test - Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          set -x
-          BUILD_DIR="${{ github.workspace }}/build"
-          ctest --test-dir "$BUILD_DIR"
-          set +x
-          # Ensure tests are run and gcda files are generated:
-          find ${{ github.workspace }}/build -name "*.gcda" -print
-          ls -l ${{ github.workspace }}/build/*.gcda || true
-      - name: Generate Coverage Report - Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          set -x
-          cd ${{ github.workspace }}/build
-          # Find all .gcda files and get their directories
-          gcda_dirs=$(find . -name "*.gcda" -print0 | xargs -0 -n 1 dirname | sort -u)
-          # Capture coverage data
-          lcov -directory . -base-directory ${{ github.workspace }} --ignore-errors mismatch -capture -output-file coverage.info
-          # Remove unwanted coverage data
-          lcov -remove coverage.info '/usr/*' '*/test/*' -output-file coverage.info
-          # Generate HTML report
-          genhtml -output-directory coverage coverage.info
-          set +x
+          cd build
+          lcov --capture --directory . --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/test/*' --output-file coverage.info
+          genhtml coverage.info --output-directory coverage
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: build/coverage

@@ -1,11 +1,20 @@
 cmake_minimum_required(VERSION 3.15)
-project(banking)
+project(banking LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Find GTest
+# Enable coverage
+option(ENABLE_COVERAGE "Enable coverage reporting" ON)
+if(ENABLE_COVERAGE)
+    add_compile_options(--coverage -fprofile-arcs -ftest-coverage)
+    add_link_options(--coverage -fprofile-arcs)
+endif()
+
+# Find GTest and GMock
 find_package(GTest REQUIRED)
+include(GoogleTest)
 
 # Source files
 set(SOURCE_FILES
@@ -36,20 +45,27 @@ target_include_directories(banking PUBLIC
 # Tests
 enable_testing()
 add_executable(banking_test ${TEST_FILES})
-target_link_libraries(banking_test banking GTest::GTest GTest::Main)
-add_test(NAME banking_tests COMMAND banking_test)
+target_link_libraries(banking_test PRIVATE
+    banking
+    GTest::GTest
+    GTest::Main
+    gmock
+)
 
-#Coverage flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
+# Automatically discover and add tests
+gtest_discover_tests(banking_test
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    TEST_PREFIX "Tests: "
+)
 
 # Set output directories
-set_target_properties(banking PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-set_target_properties(banking_test PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+# Install targets (optional)
+install(TARGETS banking
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
