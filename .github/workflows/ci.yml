@@ -17,8 +17,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Install dependencies
         run: |
@@ -26,23 +24,23 @@ jobs:
           sudo apt-get install -y \
             cmake \
             g++ \
-            libgtest-dev \
-            libgmock-dev \
             lcov \
             build-essential \
-            git
+            git \
+            libgtest-dev \
+            libgmock-dev
 
-      - name: Build GTest and GMock
+      - name: Build and install GTest/GMock
         run: |
-          cd /usr/src/gtest
-          sudo cmake CMakeLists.txt
-          sudo make
-          sudo cp *.a /usr/lib
-          
-          cd /usr/src/gmock
-          sudo cmake CMakeLists.txt
-          sudo make
-          sudo cp *.a /usr/lib
+          git clone https://github.com/google/googletest.git -b release-1.14.0 /tmp/googletest
+          cd /tmp/googletest
+          mkdir build
+          cd build
+          cmake .. -DBUILD_GMOCK=ON -DINSTALL_GTEST=ON
+          make -j$(nproc)
+          sudo make install
+          cd /tmp
+          rm -rf googletest
 
       - name: Configure project
         run: |
@@ -53,12 +51,12 @@ jobs:
       - name: Build project
         run: |
           cd build
-          cmake --build . --config Debug --verbose
+          cmake --build . --config Debug
 
       - name: Run tests
         run: |
           cd build
-          ctest --output-on-failure --verbose
+          ctest --output-on-failure
 
       - name: Generate coverage report
         run: |
@@ -72,12 +70,4 @@ jobs:
         with:
           name: coverage-report
           path: build/coverage
-          retention-days: 5
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: ${{ always() }}
-        with:
-          name: test-results
-          path: build/Testing/**/*.xml
           retention-days: 5
