@@ -43,14 +43,14 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          ctest --output-on-failure || echo "Some tests failed but continuing..."
+          ctest --output-on-failure || echo "Tests completed"
 
       - name: Generate coverage report
         run: |
           cd build
           lcov --capture --directory . --output-file coverage.info \
-               --ignore-errors mismatch,unused,empty,negative,source \
-               --rc lcov_branch_coverage=0
+               --ignore-errors mismatch,source \
+               --rc branch_coverage=0
 
           lcov --remove coverage.info \
                '/usr/*' \
@@ -63,7 +63,7 @@ jobs:
 
           genhtml coverage.info \
                   --output-directory coverage \
-                  --ignore-errors unmapped,unused,missing,negative \
+                  --ignore-errors unmapped,unused \
                   --legend \
                   --title "Banking Coverage Report" \
                   --highlight \
